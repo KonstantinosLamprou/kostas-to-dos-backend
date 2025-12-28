@@ -1,0 +1,13 @@
+GET http://localhost:5239/tasks
+###
+GET http://localhost:5239/tasks/1
+###
+GET http://localhost:5239/tasks/99
+###
+POST http://localhost:5239/tasks 
+Content-Type: application/json
+
+{
+    "title": "Frontend programmieren",
+    "TaskDatum": "2025-12-29"
+}
