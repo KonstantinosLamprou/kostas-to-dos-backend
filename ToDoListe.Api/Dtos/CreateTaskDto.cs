@@ -1,7 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ToDoListe.Api.Dtos;
 
 public record CreateTaskDto(
-    string Title, 
+    [Required][StringLength(30)] string Title, 
     bool IsComplete, 
     DateOnly TaskDatum
 ); 

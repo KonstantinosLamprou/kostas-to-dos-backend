@@ -30,12 +30,17 @@ public static class TasksEndpoints
         
     ];
 
-    
+    //Wir erweitern die Webapplication Klasse mit dieser Hilfsklasse und packen dort die Endpunkte rein 
+    //-> this ist die Markierung/Wichtig! 
     public static void MapTasksEndpoints(this WebApplication app)
-    {
+    {   
+        //DRY 
+        var group = app.MapGroup("/tasks"); 
+
+        group.MapGet("/", () => tasks); 
         // GET /tasks/id 
         //hier findet ein Parameter binding durch .Net zwischen id im Pfad und dem Argument id aus der Lambda Funktion 
-        app.MapGet("/tasks/{id}", (int id) => 
+        group.MapGet("/{id}", (int id) => 
         {
             var task =  tasks.Find(task => task.Id == id); 
             //Wichtig: Wenn nach etwas angefragt wird was nicht existiert: 
@@ -44,8 +49,10 @@ public static class TasksEndpoints
         }).WithName(GetTaskEndpointName); 
 
         // POST /tasks
-        app.MapPost("/tasks", (CreateTaskDto newTask) =>
-        {//Instanz der TaskDto -> diese wird auch dem CreatedAtRoute gegeben 
+        group.MapPost("/", (CreateTaskDto newTask) =>
+        {
+            //Instanz der TaskDto -> diese wird auch dem CreatedAtRoute gegeben 
+            
             TaskDto task = new (
                 tasks.Count + 1,
                 newTask.Title, 
@@ -60,7 +67,7 @@ public static class TasksEndpoints
         //schicke es im Body der Antwort zurück an den Client
 
         // PUT /tasks/1 
-        app.MapPut("/tasks/{id}", (int id, UpdateTaskDto updateTask) =>
+        group.MapPut("/{id}", (int id, UpdateTaskDto updateTask) =>
         {
             var index = tasks.FindIndex(task => task.Id == id); 
             //Minus 1 steht für, wenn keine results geupdated werden konnten 
@@ -81,7 +88,7 @@ public static class TasksEndpoints
 
         // DELETE /tasks/id 
 
-        app.MapDelete("/tasks/{id}", (int id) =>
+        group.MapDelete("/{id}", (int id) =>
         {
             tasks.RemoveAll(task => task.Id == id); 
                 
