@@ -12,15 +12,15 @@ Content-Type: application/json
     "TaskDatum": "2025-12-29"
 }
 ###
-PUT http://localhost:5239/tasks/1
+PUT http://localhost:5239/tasks/6
 Content-Type: application/json
 
 {
-    "id": 1,
+    "id": 6,
     "title": "Spielen und Einkaufen",
     "isComplete": false,
     "taskDatum": "2025-12-28"
 }
 
 ###
-DELETE http://localhost:5239/tasks/4 
+DELETE http://localhost:5239/tasks/3
