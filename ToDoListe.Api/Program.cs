@@ -5,12 +5,7 @@ using ToDoListe.Api.Endpoints;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddValidation(); 
-
-//connection string
-var connString = "Data Source= ToDoListe.db"; 
-builder.Services.AddSqlite<TaskContext>(
-   connString
-); 
+builder.AddTaskDb();
 
 var app = builder.Build();
 

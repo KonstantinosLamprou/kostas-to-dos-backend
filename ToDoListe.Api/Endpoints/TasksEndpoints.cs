@@ -1,4 +1,6 @@
+using ToDoListe.Api.Data;
 using ToDoListe.Api.Dtos;
+using ToDoListe.Api.Models;
 
 namespace ToDoListe.Api.Endpoints;
 
@@ -49,19 +51,32 @@ public static class TasksEndpoints
         }).WithName(GetTaskEndpointName); 
 
         // POST /tasks
-        group.MapPost("/", (CreateTaskDto newTask) =>
+        group.MapPost("/", (CreateTaskDto newTask, TaskContext dbContext) =>
         {
-            //Instanz der TaskDto -> diese wird auch dem CreatedAtRoute gegeben 
+            //Hier wird die Task genommen und als Instanz erstellt 
             
-            TaskDto task = new (
-                tasks.Count + 1,
-                newTask.Title, 
-                newTask.IsComplete,
-                newTask.TaskDatum
-            );
-            tasks.Add(task); 
+            ToDoTask task = new()
+            {
+               Id = newTask.Id,
+               Title = newTask.Title, 
+               IsComplete = newTask.IsComplete, 
+               TaskDatum = newTask.TaskDatum 
+            }; 
 
-            return Results.CreatedAtRoute(GetTaskEndpointName, new {id = task.Id}, task); 
+            //mit diesem Befehl fügen wir noch nicht ganz die Task in die Database, sondern legen
+            //fest -> diese Task sollte in die Database angelegt werden 
+            dbContext.ToDoTasks.Add(task); 
+            //hier wird nun die Task gesafed und in die Datenbank eingefügt 
+            dbContext.SaveChanges(); 
+
+            TaskDto taskDto = new(
+                task.Id, 
+                task.Title,
+                task.IsComplete,
+                task.TaskDatum
+            );
+            
+            return Results.CreatedAtRoute(GetTaskEndpointName, new {id = taskDto.Id}, taskDto); 
         }); 
         //CreatedAtRoute = wandle das Objekt in JSON um und 
         //schicke es im Body der Antwort zurück an den Client

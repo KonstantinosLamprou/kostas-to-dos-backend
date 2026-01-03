@@ -8,8 +8,9 @@ POST http://localhost:5239/tasks
 Content-Type: application/json
 
 {
-    "title": "",
-    "TaskDatum": "2025-12-29"
+
+    "title": "Programmieren",
+    "taskdatum": "2025-12-29"
 }
 ###
 PUT http://localhost:5239/tasks/6

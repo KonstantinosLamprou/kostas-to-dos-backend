@@ -11,4 +11,19 @@ public static class DataExtensions
                             .GetRequiredService<TaskContext>(); 
         dbContext.Database.Migrate(); 
     }
+
+    public static void AddTaskDb(this WebApplicationBuilder builder)
+    {
+        //connection string
+        var connString = builder.Configuration.GetConnectionString("ToDoListe");
+        //Der Db Context sollte nur ein Scoped Service sein
+        //1. Für jeden request wird einer neue Instanz für den Context erstellt 
+        //2. db verbindungen sind eine limitierte und teure resource 
+        //3. es ist nicht thread safe -> Scoped geht zukünftigen issues mit concurrency aus dem weg 
+        //4. kleinlebige instanzen -> Optimisation des Speicherverbrauchs 
+        builder.Services.AddScoped<TaskContext>(); 
+        //registrieren des contexts für den service container 
+        builder.Services.AddSqlite<TaskContext>(connString); 
+
+    }
 }
