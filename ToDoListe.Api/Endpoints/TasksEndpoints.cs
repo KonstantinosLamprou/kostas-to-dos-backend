@@ -46,7 +46,7 @@ public static class TasksEndpoints
         {
             var task = await dbContext.ToDoTasks.FindAsync(id);
             //Wichtig: Wenn nach etwas angefragt wird was nicht existiert: 
-            return task is not null ? Results.NotFound() : Results.Ok(
+            return task is null ? Results.NotFound() : Results.Ok(
                 new TaskDto(
                     task.Id,
                     task.Title,
