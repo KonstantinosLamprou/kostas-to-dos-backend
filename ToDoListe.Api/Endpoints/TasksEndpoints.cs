@@ -39,19 +39,26 @@ public static class TasksEndpoints
         //DRY 
         var group = app.MapGroup("/tasks"); 
 
-        group.MapGet("/", () => tasks); 
+        group.MapGet("/", () => tasks);
         // GET /tasks/id 
         //hier findet ein Parameter binding durch .Net zwischen id im Pfad und dem Argument id aus der Lambda Funktion 
-        group.MapGet("/{id}", (int id) => 
+        group.MapGet("/{id}", async (int id, TaskContext dbContext) =>
         {
-            var task =  tasks.Find(task => task.Id == id); 
+            var task = await dbContext.ToDoTasks.FindAsync(id);
             //Wichtig: Wenn nach etwas angefragt wird was nicht existiert: 
-            return task is not null ? Results.Ok(task) : Results.NotFound(); 
+            return task is not null ? Results.NotFound() : Results.Ok(
+                new TaskDto(
+                    task.Id,
+                    task.Title,
+                    task.IsComplete,
+                    task.TaskDatum
+                )
+            );
 
         }).WithName(GetTaskEndpointName); 
 
         // POST /tasks
-        group.MapPost("/", (CreateTaskDto newTask, TaskContext dbContext) =>
+        group.MapPost("/", async (CreateTaskDto newTask, TaskContext dbContext) =>
         {
             //Hier wird die Task genommen und als Instanz erstellt 
             
@@ -67,7 +74,7 @@ public static class TasksEndpoints
             //fest -> diese Task sollte in die Database angelegt werden 
             dbContext.ToDoTasks.Add(task); 
             //hier wird nun die Task gesafed und in die Datenbank eingefügt 
-            dbContext.SaveChanges(); 
+            await dbContext.SaveChangesAsync(); 
 
             TaskDto taskDto = new(
                 task.Id, 
@@ -75,7 +82,7 @@ public static class TasksEndpoints
                 task.IsComplete,
                 task.TaskDatum
             );
-            
+
             return Results.CreatedAtRoute(GetTaskEndpointName, new {id = taskDto.Id}, taskDto); 
         }); 
         //CreatedAtRoute = wandle das Objekt in JSON um und 
