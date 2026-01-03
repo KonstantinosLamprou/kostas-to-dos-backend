@@ -8,7 +8,9 @@ builder.Services.AddValidation();
 
 //connection string
 var connString = "Data Source= ToDoListe.db"; 
-builder.Services.AddSqlite<TaskContext>(connString); 
+builder.Services.AddSqlite<TaskContext>(
+   connString
+); 
 
 var app = builder.Build();
 
