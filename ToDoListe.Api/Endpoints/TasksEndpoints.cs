@@ -32,6 +32,7 @@ public static class TasksEndpoints
 
     
         // GET /tasks/id 
+        //Wichtig: Diesen Endpunkt nutze ich um? Die Aufgaben zu laden wenn ich die Anwendung komplett lösche
         //hier findet ein Parameter binding durch .Net zwischen id im Pfad und dem Argument id aus der Lambda Funktion 
         group.MapGet("/{id}", async (int id, TaskContext dbContext) =>
         {
@@ -47,7 +48,7 @@ public static class TasksEndpoints
             );
 
         }).WithName(GetTaskEndpointName); 
-
+        
         // POST /tasks
         group.MapPost("/", async (CreateTaskDto newTask, TaskContext dbContext) =>
         {

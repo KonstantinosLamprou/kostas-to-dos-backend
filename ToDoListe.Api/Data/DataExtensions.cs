@@ -26,4 +26,19 @@ public static class DataExtensions
         builder.Services.AddSqlite<TaskContext>(connString); 
 
     }
+
+    public static void AddingCors(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+
+            options.AddPolicy("FrontendPolicy",
+                policy =>
+                {
+                    policy.WithOrigins("http://127.0.0.1:5500")
+                                        .AllowAnyHeader()
+                                        .AllowAnyMethod();
+                })
+        );
+
+    }
 }
