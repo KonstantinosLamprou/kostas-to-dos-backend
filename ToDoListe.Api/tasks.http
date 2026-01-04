@@ -1,23 +1,23 @@
 GET http://localhost:5239/tasks
 ###
-GET http://localhost:5239/tasks/4
+GET http://localhost:5239/tasks/1
 ###
 GET http://localhost:5239/tasks/99
 ###
-POST http://localhost:5239/tasks 
+POST http://localhost:5239/tasks
 Content-Type: application/json
 
 {
 
-    "title": "Programmieren",
+    "title": "Zocken",
     "taskdatum": "2025-12-29"
 }
 ###
-PUT http://localhost:5239/tasks/6
+PUT http://localhost:5239/tasks/3
 Content-Type: application/json
 
 {
-    "id": 6,
+    "id": 3,
     "title": "Spielen und Einkaufen",
     "isComplete": false,
     "taskDatum": "2025-12-28"

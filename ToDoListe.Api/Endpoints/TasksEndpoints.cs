@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using ToDoListe.Api.Data;
 using ToDoListe.Api.Dtos;
 using ToDoListe.Api.Models;
@@ -8,29 +9,6 @@ namespace ToDoListe.Api.Endpoints;
 public static class TasksEndpoints
 {
     const string GetTaskEndpointName = "GetTask";
-    private static readonly List<TaskDto> tasks = [
-        new (
-            1, 
-            "Einkaufen",
-            true,
-            new DateOnly(2025, 12, 28)),
-        new (
-            2, 
-            "Lernen",
-            false,
-            new DateOnly(2025, 12, 29)),
-        new (
-            3, 
-            "Fußball",
-            true,
-            new DateOnly(2025, 12, 28)),
-        new (
-            4, 
-            "Spielen",
-            false,
-            new DateOnly(2025, 12, 28))
-        
-    ];
 
     //Wir erweitern die Webapplication Klasse mit dieser Hilfsklasse und packen dort die Endpunkte rein 
     //-> this ist die Markierung/Wichtig! 
@@ -39,7 +17,20 @@ public static class TasksEndpoints
         //DRY 
         var group = app.MapGroup("/tasks"); 
 
-        group.MapGet("/", () => tasks);
+        group.MapGet("/", async(TaskContext dbContext) 
+            => await dbContext.ToDoTasks
+                                    .Select(task => new TaskSummaryDto(
+                                        task.Id,
+                                        task.Title, 
+                                        task.IsComplete,
+                                        task.TaskDatum
+                                    )
+                                )
+                                .AsNoTracking()
+                                .ToListAsync()
+                            );
+
+    
         // GET /tasks/id 
         //hier findet ein Parameter binding durch .Net zwischen id im Pfad und dem Argument id aus der Lambda Funktion 
         group.MapGet("/{id}", async (int id, TaskContext dbContext) =>
@@ -47,7 +38,7 @@ public static class TasksEndpoints
             var task = await dbContext.ToDoTasks.FindAsync(id);
             //Wichtig: Wenn nach etwas angefragt wird was nicht existiert: 
             return task is null ? Results.NotFound() : Results.Ok(
-                new TaskDto(
+                new TaskSummaryDto(
                     task.Id,
                     task.Title,
                     task.IsComplete,
@@ -76,7 +67,7 @@ public static class TasksEndpoints
             //hier wird nun die Task gesafed und in die Datenbank eingefügt 
             await dbContext.SaveChangesAsync(); 
 
-            TaskDto taskDto = new(
+            TaskSummaryDto taskDto = new(
                 task.Id, 
                 task.Title,
                 task.IsComplete,
@@ -89,31 +80,32 @@ public static class TasksEndpoints
         //schicke es im Body der Antwort zurück an den Client
 
         // PUT /tasks/1 
-        group.MapPut("/{id}", (int id, UpdateTaskDto updateTask) =>
+        group.MapPut("/{id}", async(int id, UpdateTaskDto updateTask, TaskContext dbContext) =>
         {
-            var index = tasks.FindIndex(task => task.Id == id); 
-            //Minus 1 steht für, wenn keine results geupdated werden konnten 
-            if (index == -1)
+            var existingTask = await dbContext.ToDoTasks.FindAsync(id);
+
+            if(existingTask is null)
             {
                 return Results.NotFound(); 
             }
 
-            tasks[index] = new TaskDto(
-                id, 
-                updateTask.Title, 
-                updateTask.IsComplete, 
-                updateTask.TaskDatum
-            );
+            existingTask.Title = updateTask.Title;
+            existingTask.IsComplete = updateTask.IsComplete;
+            existingTask.TaskDatum = updateTask.TaskDatum; 
+
+            await dbContext.SaveChangesAsync(); 
 
             return Results.NoContent(); 
         }); 
 
         // DELETE /tasks/id 
-
-        group.MapDelete("/{id}", (int id) =>
+        group.MapDelete("/{id}", async(int id, TaskContext dbContext) =>
         {
-            tasks.RemoveAll(task => task.Id == id); 
-                
+            //bulk deletion
+            await dbContext.ToDoTasks
+                                .Where(task => id == task.Id)
+                                .ExecuteDeleteAsync(); 
+
             return Results.NoContent(); 
         }); 
     }
