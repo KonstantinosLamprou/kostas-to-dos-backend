@@ -56,7 +56,6 @@ public static class TasksEndpoints
             
             ToDoTask task = new()
             {
-               Id = newTask.Id,
                Title = newTask.Title, 
                IsComplete = newTask.IsComplete, 
                TaskDatum = newTask.TaskDatum 

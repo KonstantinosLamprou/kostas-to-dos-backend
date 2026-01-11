@@ -9,7 +9,7 @@ Content-Type: application/json
 
 {
 
-    "title": "Zocken",
+    "title": "Lol",
     "taskdatum": "2025-12-29"
 }
 ###
@@ -24,4 +24,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:5239/tasks/3
+DELETE http://localhost:5239/tasks/2

@@ -9,7 +9,7 @@ namespace ToDoListe.Api.Models;
 //Wenn man die Daten später wieder als Antwort zurückschickt, nutzt ASP.NET Core die Getter (get), um das JSON zu erzeugen.
 public class ToDoTask
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Title { get; set; }
 
     public bool IsComplete { get; set; }

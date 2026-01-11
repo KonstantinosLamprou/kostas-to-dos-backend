@@ -6,7 +6,7 @@ namespace ToDoListe.Api.Dtos;
 //zueinander teilt, wie es Daten transferiert und handled.  
 
 public record TaskSummaryDto(
-    [Required] int Id, 
+    [Required] int Id,
     [Required][StringLength(30)]string Title, 
     bool IsComplete, 
     DateOnly TaskDatum 
